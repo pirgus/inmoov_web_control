@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import logging
 import threading
+import time
 from dataclasses import dataclass, asdict
 from typing import Dict, Any, Optional
 
@@ -186,6 +187,8 @@ PRESETS: Dict[str, Dict[str, Any]] = {
     },
     "hand_closed": {
         "label": "Mão Fechada (Punho)",
+        # O polegar fecha somente após os demais dedos para não bloqueá-los.
+        "thumb_delay_s": 0.8,
         "angles": {
             "thumb": 0.0,
             "index": 180.0,
@@ -206,6 +209,7 @@ PRESETS: Dict[str, Dict[str, Any]] = {
     },
     "point": {
         "label": "Apontar (Indicador Esticado)",
+        "thumb_delay_s": 0.8,
         "angles": {
             "thumb": 0.0,
             "index": 0.0,
@@ -216,6 +220,7 @@ PRESETS: Dict[str, Dict[str, Any]] = {
     },
     "peace": {
         "label": "Sinal de Paz (Indicador + Médio)",
+        "thumb_delay_s": 0.8,
         "angles": {
             "thumb": 0.0,
             "index": 0.0,
@@ -392,10 +397,25 @@ class InMoovServoController:
         return self.set_multiple_angles(updates)
 
     def apply_preset(self, preset_name: str) -> Dict[str, Any]:
-        """Aplica um preset pré-configurado."""
+        """
+        Aplica um preset pré-configurado.
+
+        Se o preset definir `thumb_delay_s`, os demais servos são movidos primeiro
+        e o polegar só é acionado após esse atraso (evita que o polegar fechado
+        bloqueie o curso dos outros dedos).
+        """
         if preset_name not in PRESETS:
             raise KeyError(f"Preset desconhecido: '{preset_name}'")
-        preset_angles = PRESETS[preset_name]["angles"]
+        preset = PRESETS[preset_name]
+        preset_angles = preset["angles"]
+        thumb_delay = float(preset.get("thumb_delay_s", 0.0))
+
+        if thumb_delay > 0 and "thumb" in preset_angles:
+            others = {k: v for k, v in preset_angles.items() if k != "thumb"}
+            self.set_multiple_angles(others)
+            time.sleep(thumb_delay)
+            return self.set_multiple_angles({"thumb": preset_angles["thumb"]})
+
         return self.set_multiple_angles(preset_angles)
 
     def release_all(self) -> Dict[str, Any]:
