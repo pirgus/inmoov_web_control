@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InMoov — Controle do Braço Direito (PCA9685)</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">🤖</div>
+      <div>
+        <h1>InMoov — Controle do Braço Direito</h1>
+        <p class="subtitle">Raspberry Pi 5 • Driver I2C PCA9685 (16 Canais PWM)</p>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <div id="hwBadge" class="hw-badge sim" title="Status da conexão com o módulo PCA9685">
+        <span class="dot"></span>
+        <span id="hwStatusText">Conectando...</span>
+      </div>
+      <button id="btnResetNeutral" class="btn btn-primary" title="Retornar todos os servos para a posição inicial segura">
+        Posição Neutra
+      </button>
+      <button id="btnWavePose" class="btn btn-secondary" title="Mover para pose de cumprimento">
+        Pose Cumprimento
+      </button>
+      <button id="btnReleaseAll" class="btn btn-danger" title="Desativar pulsos PWM em todos os canais do PCA9685">
+        Relaxar Servos (PWM Off)
+      </button>
+    </div>
+  </header>
+
+  <main class="dashboard">
+    <!-- COLUNA ESQUERDA: VISUALIZAÇÃO 3D E ESQUEMA 2D -->
+    <section class="visual-column">
+      <!-- Card 3D -->
+      <div class="card visual-card">
+        <div class="card-header">
+          <div>
+            <h2>Representação Visual 3D — Braço Direito e Mão</h2>
+            <p class="card-hint">Arraste para girar a câmera • Role para zoom • Cinemática sincronizada com os canais do PCA9685</p>
+          </div>
+          <div class="camera-toolbar">
+            <button class="btn-chip active" data-cam="perspective">3D</button>
+            <button class="btn-chip" data-cam="front">Frontal</button>
+            <button class="btn-chip" data-cam="side">Lateral</button>
+            <button class="btn-chip" data-cam="top">Superior</button>
+            <button class="btn-chip" data-cam="hand">Foco Mão</button>
+          </div>
+        </div>
+
+        <div class="canvas-wrapper">
+          <canvas id="arm3dCanvas" width="760" height="430"></canvas>
+          <div class="canvas-overlay-legend">
+            <div><span class="legend-dot torso"></span> Tronco / Ombro Base</div>
+            <div><span class="legend-dot upper"></span> Úmero / Bíceps (CH 12, 11, 9)</div>
+            <div><span class="legend-dot forearm"></span> Cotovelo / Antebraço (CH 8)</div>
+            <div><span class="legend-dot hand"></span> Mão Direita (CH 0, 1, 3, 4, 5)</div>
+          </div>
+          <div id="eeReadout" class="canvas-telemetry">
+            Punho 3D: X: 0.00m | Y: 0.00m | Z: 0.00m
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Esquema da Mão 2D + Medidores das Articulações do Braço -->
+      <div class="card schematic-card">
+        <div class="schematic-grid">
+          <!-- Esquema Visual da Mão Direita -->
+          <div class="hand-viz-panel">
+            <div class="panel-title-row">
+              <h3>Esquema da Mão Direita (Visão Palmar)</h3>
+              <span class="tag-info">CH 3 Invertido</span>
+            </div>
+            <div class="svg-hand-container">
+              <svg id="handSvg" viewBox="0 0 320 270" aria-label="Visualização da mão direita">
+                <!-- Palma da mão -->
+                <path d="M 95 145 Q 85 215 110 245 L 225 245 Q 250 215 245 140 Z"
+                      fill="#1e293b" stroke="#475569" stroke-width="2.5" />
+                <text x="168" y="205" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="600">
+                  PALMA DIREITA
+                </text>
+                <text id="handAvgClosureText" x="168" y="224" text-anchor="middle" fill="#38bdf8" font-size="12" font-weight="700">
+                  0% Fechada
+                </text>
+
+                <!-- Grupos dinâmicos dos 5 dedos preenchidos via JS -->
+                <g id="svgFingersLayer"></g>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Medidores (Gauges) dos 4 Servos do Braço -->
+          <div class="gauges-panel">
+            <div class="panel-title-row">
+              <h3>Limites e Posição Angular do Braço</h3>
+              <span class="tag-info">Canais 8, 9, 11, 12</span>
+            </div>
+            <div id="armGaugesContainer" class="gauges-grid">
+              <!-- Preenchido dinamicamente pelo app.js -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COLUNA DIREITA: SLIDERS DE CONTROLE -->
+    <section class="controls-column">
+      <!-- Controle das Articulações do Braço -->
+      <div class="card controls-card">
+        <div class="card-header">
+          <div>
+            <h2>Articulações do Braço Direito</h2>
+            <p class="card-hint">Limites angulares travados conforme a geometria mecânica de cada servo</p>
+          </div>
+          <span class="channel-pill">Canais 8, 9, 11, 12</span>
+        </div>
+
+        <div id="armSlidersContainer" class="sliders-list">
+          <!-- Sliders do braço gerados via JS -->
+        </div>
+      </div>
+
+      <!-- Controle dos Dedos da Mão -->
+      <div class="card controls-card">
+        <div class="card-header">
+          <div>
+            <h2>Dedos da Mão Direita</h2>
+            <p class="card-hint">0° = Esticado / 180° = Fechado (exceto Dedo Médio no CH 3: 180° = Esticado / 0° = Fechado)</p>
+          </div>
+          <span class="channel-pill">Canais 0, 1, 3, 4, 5</span>
+        </div>
+
+        <!-- Controle Mestre e Presets de Mão -->
+        <div class="hand-master-box">
+          <div class="master-slider-header">
+            <label for="masterHandSlider">Fechamento Sincronizado da Mão (Todos os Dedos)</label>
+            <span id="masterHandValue" class="master-badge">0% Fechada</span>
+          </div>
+          <input
+            type="range"
+            id="masterHandSlider"
+            min="0"
+            max="100"
+            step="1"
+            value="0"
+            class="servo-range master-range"
+          />
+          <div class="range-sublabels">
+            <span>0% (Todos Esticados)</span>
+            <span>50% (Semi-fechados)</span>
+            <span>100% (Punho Fechado)</span>
+          </div>
+
+          <div class="preset-buttons-row">
+            <button class="btn-preset" data-preset="hand_open">🖐️ Mão Aberta</button>
+            <button class="btn-preset" data-preset="hand_closed">✊ Punho Fechado</button>
+            <button class="btn-preset" data-preset="pinch">🤏 Pinça</button>
+            <button class="btn-preset" data-preset="point">☝️ Apontar</button>
+            <button class="btn-preset" data-preset="peace">✌️ Paz</button>
+          </div>
+        </div>
+
+        <div id="handSlidersContainer" class="sliders-list">
+          <!-- Sliders dos dedos gerados via JS -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
