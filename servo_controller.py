@@ -33,7 +33,16 @@ class ServoConfig:
     max_label: str
     neutral_label: Optional[str] = None
     description: str = ""
+    # Faixa de largura de pulso (µs) mapeada para 0°..180° neste servo.
+    # Ajuste por servo para que 0°/180° não empurrem o motor contra o batente interno.
+    min_pulse_us: int = 500
+    max_pulse_us: int = 2500
+    servo_model: str = ""
 
+
+# Faixas de pulso padrão por modelo de servo
+MG996R_PULSE = {"min_pulse_us": 600, "max_pulse_us": 2400, "servo_model": "MG996R"}
+LF20MG_PULSE = {"min_pulse_us": 500, "max_pulse_us": 2500, "servo_model": "Power HD LF-20MG"}
 
 # Especificação completa dos 9 servos do braço direito InMoov
 SERVO_DEFINITIONS: Dict[str, ServoConfig] = {
@@ -42,6 +51,7 @@ SERVO_DEFINITIONS: Dict[str, ServoConfig] = {
         name="Polegar (Invertido)",
         group="hand",
         channel=0,
+        **MG996R_PULSE,
         min_angle=0.0,
         max_angle=180.0,
         default_angle=180.0,
@@ -55,6 +65,7 @@ SERVO_DEFINITIONS: Dict[str, ServoConfig] = {
         name="Indicador",
         group="hand",
         channel=1,
+        **MG996R_PULSE,
         min_angle=0.0,
         max_angle=180.0,
         default_angle=0.0,
@@ -68,6 +79,7 @@ SERVO_DEFINITIONS: Dict[str, ServoConfig] = {
         name="Médio",
         group="hand",
         channel=3,
+        **MG996R_PULSE,
         min_angle=0.0,
         max_angle=180.0,
         default_angle=0.0,
@@ -81,6 +93,7 @@ SERVO_DEFINITIONS: Dict[str, ServoConfig] = {
         name="Anelar",
         group="hand",
         channel=4,
+        **MG996R_PULSE,
         min_angle=0.0,
         max_angle=180.0,
         default_angle=0.0,
@@ -94,6 +107,7 @@ SERVO_DEFINITIONS: Dict[str, ServoConfig] = {
         name="Mindinho (Invertido)",
         group="hand",
         channel=5,
+        **MG996R_PULSE,
         min_angle=0.0,
         max_angle=180.0,
         default_angle=180.0,
@@ -107,6 +121,7 @@ SERVO_DEFINITIONS: Dict[str, ServoConfig] = {
         name="Cotovelo (Flexão/Extensão)",
         group="arm",
         channel=8,
+        **LF20MG_PULSE,
         min_angle=125.0,
         max_angle=180.0,
         default_angle=180.0,
@@ -120,6 +135,7 @@ SERVO_DEFINITIONS: Dict[str, ServoConfig] = {
         name="Rotação do Braço (Eixo Próprio)",
         group="arm",
         channel=9,
+        **LF20MG_PULSE,
         min_angle=0.0,
         max_angle=180.0,
         default_angle=90.0,
@@ -134,6 +150,7 @@ SERVO_DEFINITIONS: Dict[str, ServoConfig] = {
         name="Rotação do Ombro",
         group="arm",
         channel=11,
+        **LF20MG_PULSE,
         min_angle=0.0,
         max_angle=180.0,
         default_angle=90.0,
@@ -148,6 +165,7 @@ SERVO_DEFINITIONS: Dict[str, ServoConfig] = {
         name="Abdução / Adução do Ombro",
         group="arm",
         channel=12,
+        **LF20MG_PULSE,
         min_angle=30.0,
         max_angle=85.0,
         default_angle=85.0,
@@ -293,7 +311,14 @@ class InMoovServoController:
             )
             for cfg in self._configs.values():
                 self._kit.servo[cfg.channel].actuation_range = 180
-                self._kit.servo[cfg.channel].set_pulse_width_range(500, 2500)
+                self._kit.servo[cfg.channel].set_pulse_width_range(
+                    cfg.min_pulse_us, cfg.max_pulse_us
+                )
+                logger.info(
+                    "Canal %d (%s, %s): pulso %d–%d µs",
+                    cfg.channel, cfg.id, cfg.servo_model or "?",
+                    cfg.min_pulse_us, cfg.max_pulse_us,
+                )
             self.simulation_mode = False
             self.hardware_error = None
             logger.info(
