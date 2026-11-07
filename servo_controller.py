@@ -38,16 +38,16 @@ class ServoConfig:
 SERVO_DEFINITIONS: Dict[str, ServoConfig] = {
     "thumb": ServoConfig(
         id="thumb",
-        name="Polegar",
+        name="Polegar (Invertido)",
         group="hand",
         channel=0,
         min_angle=0.0,
         max_angle=180.0,
-        default_angle=0.0,
-        inverted=False,
-        min_label="0° (Esticado)",
-        max_label="180° (Fechado)",
-        description="Flexão do polegar direito (0° aberto/esticado, 180° fechado).",
+        default_angle=180.0,
+        inverted=True,
+        min_label="0° (Fechado)",
+        max_label="180° (Esticado)",
+        description="Flexão do polegar direito (relação inversa: 0° fechado, 180° esticado).",
     ),
     "index": ServoConfig(
         id="index",
@@ -64,16 +64,16 @@ SERVO_DEFINITIONS: Dict[str, ServoConfig] = {
     ),
     "middle": ServoConfig(
         id="middle",
-        name="Médio (Invertido)",
+        name="Médio",
         group="hand",
         channel=3,
         min_angle=0.0,
         max_angle=180.0,
-        default_angle=180.0,
-        inverted=True,
-        min_label="0° (Fechado)",
-        max_label="180° (Esticado)",
-        description="Flexão do dedo médio (relação inversa pela posição física do servo: 0° fechado, 180° esticado).",
+        default_angle=0.0,
+        inverted=False,
+        min_label="0° (Esticado)",
+        max_label="180° (Fechado)",
+        description="Flexão do dedo médio (0° aberto/esticado, 180° fechado).",
     ),
     "ring": ServoConfig(
         id="ring",
@@ -90,16 +90,16 @@ SERVO_DEFINITIONS: Dict[str, ServoConfig] = {
     ),
     "pinky": ServoConfig(
         id="pinky",
-        name="Mindinho",
+        name="Mindinho (Invertido)",
         group="hand",
         channel=5,
         min_angle=0.0,
         max_angle=180.0,
-        default_angle=0.0,
-        inverted=False,
-        min_label="0° (Esticado)",
-        max_label="180° (Fechado)",
-        description="Flexão do dedo mínimo (0° aberto/esticado, 180° fechado).",
+        default_angle=180.0,
+        inverted=True,
+        min_label="0° (Fechado)",
+        max_label="180° (Esticado)",
+        description="Flexão do dedo mínimo (relação inversa: 0° fechado, 180° esticado).",
     ),
     "elbow": ServoConfig(
         id="elbow",
@@ -163,11 +163,11 @@ PRESETS: Dict[str, Dict[str, Any]] = {
     "neutral": {
         "label": "Posição Neutra / Inicial",
         "angles": {
-            "thumb": 0.0,
+            "thumb": 180.0,
             "index": 0.0,
-            "middle": 180.0,
+            "middle": 0.0,
             "ring": 0.0,
-            "pinky": 0.0,
+            "pinky": 180.0,
             "elbow": 180.0,
             "arm_roll": 90.0,
             "shoulder_pitch": 90.0,
@@ -177,61 +177,61 @@ PRESETS: Dict[str, Dict[str, Any]] = {
     "hand_open": {
         "label": "Mão Aberta (Dedos Esticados)",
         "angles": {
-            "thumb": 0.0,
+            "thumb": 180.0,
             "index": 0.0,
-            "middle": 180.0,
+            "middle": 0.0,
             "ring": 0.0,
-            "pinky": 0.0,
+            "pinky": 180.0,
         },
     },
     "hand_closed": {
         "label": "Mão Fechada (Punho)",
         "angles": {
-            "thumb": 180.0,
+            "thumb": 0.0,
             "index": 180.0,
-            "middle": 0.0,
+            "middle": 180.0,
             "ring": 180.0,
-            "pinky": 180.0,
+            "pinky": 0.0,
         },
     },
     "pinch": {
         "label": "Pinça (Polegar + Indicador)",
         "angles": {
-            "thumb": 140.0,
+            "thumb": 40.0,
             "index": 140.0,
-            "middle": 180.0,
+            "middle": 0.0,
             "ring": 0.0,
-            "pinky": 0.0,
+            "pinky": 180.0,
         },
     },
     "point": {
         "label": "Apontar (Indicador Esticado)",
         "angles": {
-            "thumb": 180.0,
+            "thumb": 0.0,
             "index": 0.0,
-            "middle": 0.0,
+            "middle": 180.0,
             "ring": 180.0,
-            "pinky": 180.0,
+            "pinky": 0.0,
         },
     },
     "peace": {
         "label": "Sinal de Paz (Indicador + Médio)",
         "angles": {
-            "thumb": 180.0,
+            "thumb": 0.0,
             "index": 0.0,
-            "middle": 180.0,
+            "middle": 0.0,
             "ring": 180.0,
-            "pinky": 180.0,
+            "pinky": 0.0,
         },
     },
     "wave_pose": {
         "label": "Posição de Cumprimento",
         "angles": {
-            "thumb": 0.0,
+            "thumb": 180.0,
             "index": 0.0,
-            "middle": 180.0,
+            "middle": 0.0,
             "ring": 0.0,
-            "pinky": 0.0,
+            "pinky": 180.0,
             "elbow": 135.0,
             "arm_roll": 90.0,
             "shoulder_pitch": 115.0,
@@ -323,7 +323,7 @@ class InMoovServoController:
         """
         Retorna um valor normalizado [0.0, 1.0] para representação visual:
         - Para os dedos: 0.0 = totalmente esticado, 1.0 = totalmente fechado.
-          (Trata automaticamente a inversão do dedo médio no canal 3).
+          (Trata automaticamente a inversão do polegar (canal 0) e do mindinho (canal 5)).
         - Para o cotovelo (125° a 180°): 0.0 = esticado (180°), 1.0 = fechado (125°).
         - Para a abdução do ombro (30° a 85°): 0.0 = abaixado (85°), 1.0 = levantado (30°).
         """
@@ -379,7 +379,7 @@ class InMoovServoController:
     def set_hand_closure(self, closure_percent: float) -> Dict[str, Any]:
         """
         Define o fechamento global de todos os 5 dedos (0% = mão aberta/esticada, 100% = mão fechada).
-        Respeita automaticamente a inversão do dedo médio (canal 3).
+        Respeita automaticamente a inversão do polegar (canal 0) e do mindinho (canal 5).
         """
         pct = max(0.0, min(100.0, float(closure_percent))) / 100.0
         updates: Dict[str, float] = {}
