@@ -28,11 +28,11 @@ não estiverem disponíveis, o sistema entra automaticamente em **modo de simula
 
 | Canal | Servo                     | Faixa      | Observação                     |
 |-------|---------------------------|------------|--------------------------------|
-| 0     | Polegar                   | 0°–180°    | 180° esticado, 0° fechado      |
-| 1     | Indicador                 | 0°–180°    | 0° esticado, 180° fechado      |
-| 3     | Médio                     | 0°–180°    | 0° esticado, 180° fechado      |
-| 4     | Anelar                    | 0°–180°    | 0° esticado, 180° fechado      |
-| 5     | Mindinho                  | 0°–180°    | 180° esticado, 0° fechado      |
+| 0     | Polegar                   | 40°–140°   | 140° esticado, 40° fechado     |
+| 1     | Indicador                 | 40°–140°   | 40° esticado, 140° fechado     |
+| 3     | Médio                     | 40°–140°   | 40° esticado, 140° fechado     |
+| 4     | Anelar                    | 40°–140°   | 40° esticado, 140° fechado     |
+| 5     | Mindinho                  | 40°–140°   | 140° esticado, 40° fechado     |
 | 8     | Cotovelo                  | 125°–180°  | 180° esticado, 125° fechado    |
 | 9     | Rotação do braço          | 0°–180°    | 90° reto para frente           |
 | 11    | Rotação do ombro          | 0°–180°    | 90° central                    |

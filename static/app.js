@@ -13,11 +13,11 @@ const ARM_ORDER = [
 ];
 
 const HAND_ORDER = [
-  "thumb",  // CH 0 (0° a 180° - INVERTIDO)
-  "index",  // CH 1 (0° a 180°)
-  "middle", // CH 3 (0° a 180°)
-  "ring",   // CH 4 (0° a 180°)
-  "pinky",  // CH 5 (0° a 180° - INVERTIDO)
+  "thumb",  // CH 0 (40° a 140° - INVERTIDO)
+  "index",  // CH 1 (40° a 140°)
+  "middle", // CH 3 (40° a 140°)
+  "ring",   // CH 4 (40° a 140°)
+  "pinky",  // CH 5 (40° a 140° - INVERTIDO)
 ];
 
 // Estado padrão embutido (permite pré-visualização mesmo abrindo o index.html direto no navegador)
@@ -28,28 +28,28 @@ const DEFAULT_FALLBACK_STATE = {
   servos: {
     thumb: {
       id: "thumb", name: "Polegar (Invertido)", group: "hand", channel: 0,
-      min_angle: 0, max_angle: 180, default_angle: 180, angle: 180, inverted: true,
-      min_label: "0° (Fechado)", max_label: "180° (Esticado)", neutral_label: null,
+      min_angle: 40, max_angle: 140, default_angle: 140, angle: 140, inverted: true,
+      min_label: "40° (Fechado)", max_label: "140° (Esticado)", neutral_label: null,
     },
     index: {
       id: "index", name: "Indicador", group: "hand", channel: 1,
-      min_angle: 0, max_angle: 180, default_angle: 0, angle: 0, inverted: false,
-      min_label: "0° (Esticado)", max_label: "180° (Fechado)", neutral_label: null,
+      min_angle: 40, max_angle: 140, default_angle: 40, angle: 40, inverted: false,
+      min_label: "40° (Esticado)", max_label: "140° (Fechado)", neutral_label: null,
     },
     middle: {
       id: "middle", name: "Médio", group: "hand", channel: 3,
-      min_angle: 0, max_angle: 180, default_angle: 0, angle: 0, inverted: false,
-      min_label: "0° (Esticado)", max_label: "180° (Fechado)", neutral_label: null,
+      min_angle: 40, max_angle: 140, default_angle: 40, angle: 40, inverted: false,
+      min_label: "40° (Esticado)", max_label: "140° (Fechado)", neutral_label: null,
     },
     ring: {
       id: "ring", name: "Anelar", group: "hand", channel: 4,
-      min_angle: 0, max_angle: 180, default_angle: 0, angle: 0, inverted: false,
-      min_label: "0° (Esticado)", max_label: "180° (Fechado)", neutral_label: null,
+      min_angle: 40, max_angle: 140, default_angle: 40, angle: 40, inverted: false,
+      min_label: "40° (Esticado)", max_label: "140° (Fechado)", neutral_label: null,
     },
     pinky: {
       id: "pinky", name: "Mindinho (Invertido)", group: "hand", channel: 5,
-      min_angle: 0, max_angle: 180, default_angle: 180, angle: 180, inverted: true,
-      min_label: "0° (Fechado)", max_label: "180° (Esticado)", neutral_label: null,
+      min_angle: 40, max_angle: 140, default_angle: 140, angle: 140, inverted: true,
+      min_label: "40° (Fechado)", max_label: "140° (Esticado)", neutral_label: null,
     },
     elbow: {
       id: "elbow", name: "Cotovelo (Flexão/Extensão)", group: "arm", channel: 8,
@@ -74,25 +74,25 @@ const DEFAULT_FALLBACK_STATE = {
   },
   presets: {
     neutral: {
-      angles: { thumb: 180, index: 0, middle: 0, ring: 0, pinky: 180, elbow: 180, arm_roll: 90, shoulder_pitch: 90, shoulder_abduction: 85 },
+      angles: { thumb: 140, index: 40, middle: 40, ring: 40, pinky: 140, elbow: 180, arm_roll: 90, shoulder_pitch: 90, shoulder_abduction: 85 },
     },
     hand_open: {
-      angles: { thumb: 180, index: 0, middle: 0, ring: 0, pinky: 180 },
+      angles: { thumb: 140, index: 40, middle: 40, ring: 40, pinky: 140 },
     },
     hand_closed: {
-      angles: { thumb: 0, index: 180, middle: 180, ring: 180, pinky: 0 },
+      angles: { thumb: 40, index: 140, middle: 140, ring: 140, pinky: 40 },
     },
     pinch: {
-      angles: { thumb: 40, index: 140, middle: 0, ring: 0, pinky: 180 },
+      angles: { thumb: 40, index: 140, middle: 40, ring: 40, pinky: 140 },
     },
     point: {
-      angles: { thumb: 0, index: 0, middle: 180, ring: 180, pinky: 0 },
+      angles: { thumb: 40, index: 40, middle: 140, ring: 140, pinky: 40 },
     },
     peace: {
-      angles: { thumb: 0, index: 0, middle: 0, ring: 180, pinky: 0 },
+      angles: { thumb: 40, index: 40, middle: 40, ring: 140, pinky: 40 },
     },
     wave_pose: {
-      angles: { thumb: 180, index: 0, middle: 0, ring: 0, pinky: 180, elbow: 135, arm_roll: 90, shoulder_pitch: 115, shoulder_abduction: 45 },
+      angles: { thumb: 140, index: 40, middle: 40, ring: 40, pinky: 140, elbow: 135, arm_roll: 90, shoulder_pitch: 115, shoulder_abduction: 45 },
     },
   },
 };
@@ -221,7 +221,7 @@ function buildSliders(containerId, orderList) {
           <span class="servo-name">${cfg.name}</span>
           ${
             cfg.inverted && cfg.group === "hand"
-              ? '<span class="inv-badge" title="Posicionamento físico invertido: 180° esticado, 0° fechado">INVERTIDO (180°=Esticado)</span>'
+              ? `<span class="inv-badge" title="Posicionamento físico invertido: ${cfg.max_angle}° esticado, ${cfg.min_angle}° fechado">INVERTIDO (${cfg.max_angle}°=Esticado)</span>`
               : ""
           }
         </div>
