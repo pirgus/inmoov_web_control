@@ -91,6 +91,12 @@ const DEFAULT_FALLBACK_STATE = {
     peace: {
       angles: { thumb: 20, index: 20, middle: 20, ring: 160, pinky: 20 },
     },
+    rock: {
+      angles: { thumb: 20, index: 20, middle: 160, ring: 160, pinky: 160 },
+    },
+    secret: {
+      angles: { thumb: 20, index: 160, middle: 20, ring: 160, pinky: 20 },
+    },
     wave_pose: {
       angles: { thumb: 160, index: 20, middle: 20, ring: 20, pinky: 160, elbow: 135, arm_roll: 90, shoulder_pitch: 115, shoulder_abduction: 45 },
     },

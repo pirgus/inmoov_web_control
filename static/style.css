@@ -451,6 +451,18 @@ body {
   border-color: var(--accent-blue);
 }
 
+.btn-preset-secret {
+  border-style: dashed;
+  border-color: rgba(245, 158, 11, 0.45);
+  color: #cbd5e1;
+}
+
+.btn-preset-secret:hover {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: var(--accent-amber);
+  color: #fbbf24;
+}
+
 .sliders-list {
   display: flex;
   flex-direction: column;

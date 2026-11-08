@@ -247,6 +247,28 @@ PRESETS: Dict[str, Dict[str, Any]] = {
             "pinky": 20.0,
         },
     },
+    "rock": {
+        "label": "Sinal de Rock (Indicador + Mindinho)",
+        "thumb_delay_s": 0.8,
+        "angles": {
+            "thumb": 20.0,
+            "index": 20.0,
+            "middle": 160.0,
+            "ring": 160.0,
+            "pinky": 160.0,
+        },
+    },
+    "secret": {
+        "label": "Movimento Secreto (Dedo Médio)",
+        "thumb_delay_s": 0.8,
+        "angles": {
+            "thumb": 20.0,
+            "index": 160.0,
+            "middle": 20.0,
+            "ring": 160.0,
+            "pinky": 20.0,
+        },
+    },
     "wave_pose": {
         "label": "Posição de Cumprimento",
         "angles": {

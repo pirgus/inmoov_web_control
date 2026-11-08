@@ -204,7 +204,7 @@ Todos os endpoints usam JSON.
 | POST   | `/api/release`  | `{}`                                          | Desliga o PWM (relaxa os servos)|
 
 Presets disponíveis: `neutral`, `hand_open`, `hand_closed`, `pinch`, `point`,
-`peace` e `wave_pose`.
+`peace`, `rock`, `secret` e `wave_pose`.
 
 Exemplo:
 
