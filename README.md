@@ -169,9 +169,12 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
+Type=simple
 User=pi
 WorkingDirectory=/home/pi/inmoov/inmoov_web_control
 ExecStart=/home/pi/inmoov/.venv/bin/python server.py --port 8000
+KillSignal=SIGTERM
+TimeoutStopSec=5
 Restart=on-failure
 RestartSec=3
 

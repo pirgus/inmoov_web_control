@@ -12,8 +12,10 @@ import argparse
 import json
 import logging
 import mimetypes
+import signal
 import socket
 import sys
+import threading
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -26,6 +28,13 @@ if __package__ is None or __package__ == "":
 from inmoov_web_control.servo_controller import InMoovServoController
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
+
+
+class ReusableThreadingHTTPServer(ThreadingHTTPServer):
+    """Servidor HTTP multithread com reutilização imediata de porta e threads daemon."""
+
+    allow_reuse_address = True
+    daemon_threads = True
 
 
 class InMoovRequestHandler(BaseHTTPRequestHandler):
@@ -211,8 +220,16 @@ def main() -> None:
     )
     InMoovRequestHandler.controller = controller
 
-    server = ThreadingHTTPServer((args.host, args.port), InMoovRequestHandler)
+    server = ReusableThreadingHTTPServer((args.host, args.port), InMoovRequestHandler)
     local_ip = get_local_ip()
+
+    def handle_shutdown_signal(signum: int, _frame: Any) -> None:
+        sig_name = signal.Signals(signum).name
+        logging.info("Sinal %s recebido. Encerrando servidor e liberando porta %d...", sig_name, args.port)
+        threading.Thread(target=server.shutdown, daemon=True).start()
+
+    signal.signal(signal.SIGTERM, handle_shutdown_signal)
+    signal.signal(signal.SIGINT, handle_shutdown_signal)
 
     mode_str = (
         "MODO SIMULAÇÃO (sem hardware PCA9685 ativo)"
@@ -233,7 +250,10 @@ def main() -> None:
     except KeyboardInterrupt:
         print("\nEncerrando servidor web InMoov...")
     finally:
+        logging.info("Desativando pulsos PWM dos servos e liberando socket HTTP...")
+        controller.release_all()
         server.server_close()
+        logging.info("Servidor encerrado com sucesso.")
 
 
 if __name__ == "__main__":
