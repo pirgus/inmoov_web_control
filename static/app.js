@@ -13,11 +13,11 @@ const ARM_ORDER = [
 ];
 
 const HAND_ORDER = [
-  "thumb",  // CH 0 (20° a 160° - INVERTIDO)
-  "index",  // CH 1 (20° a 160°)
-  "middle", // CH 3 (20° a 160°)
-  "ring",   // CH 4 (20° a 160°)
-  "pinky",  // CH 5 (20° a 160° - INVERTIDO)
+  "thumb",  // CH 0 (50° a 140° - INVERTIDO)
+  "index",  // CH 1 (50° a 140°)
+  "middle", // CH 3 (50° a 140°)
+  "ring",   // CH 4 (50° a 140°)
+  "pinky",  // CH 5 (50° a 140° - INVERTIDO)
 ];
 
 // Estado padrão embutido (permite pré-visualização mesmo abrindo o index.html direto no navegador)
@@ -28,28 +28,28 @@ const DEFAULT_FALLBACK_STATE = {
   servos: {
     thumb: {
       id: "thumb", name: "Polegar (Invertido)", group: "hand", channel: 0,
-      min_angle: 20, max_angle: 160, default_angle: 160, angle: 160, inverted: true,
-      min_label: "20° (Fechado)", max_label: "160° (Esticado)", neutral_label: null,
+      min_angle: 50, max_angle: 140, default_angle: 140, angle: 140, inverted: true,
+      min_label: "50° (Fechado)", max_label: "140° (Esticado)", neutral_label: null,
     },
     index: {
       id: "index", name: "Indicador", group: "hand", channel: 1,
-      min_angle: 20, max_angle: 160, default_angle: 20, angle: 20, inverted: false,
-      min_label: "20° (Esticado)", max_label: "160° (Fechado)", neutral_label: null,
+      min_angle: 50, max_angle: 140, default_angle: 50, angle: 50, inverted: false,
+      min_label: "50° (Esticado)", max_label: "140° (Fechado)", neutral_label: null,
     },
     middle: {
       id: "middle", name: "Médio", group: "hand", channel: 3,
-      min_angle: 20, max_angle: 160, default_angle: 20, angle: 20, inverted: false,
-      min_label: "20° (Esticado)", max_label: "160° (Fechado)", neutral_label: null,
+      min_angle: 50, max_angle: 140, default_angle: 50, angle: 50, inverted: false,
+      min_label: "50° (Esticado)", max_label: "140° (Fechado)", neutral_label: null,
     },
     ring: {
       id: "ring", name: "Anelar", group: "hand", channel: 4,
-      min_angle: 20, max_angle: 160, default_angle: 20, angle: 20, inverted: false,
-      min_label: "20° (Esticado)", max_label: "160° (Fechado)", neutral_label: null,
+      min_angle: 50, max_angle: 140, default_angle: 50, angle: 50, inverted: false,
+      min_label: "50° (Esticado)", max_label: "140° (Fechado)", neutral_label: null,
     },
     pinky: {
       id: "pinky", name: "Mindinho (Invertido)", group: "hand", channel: 5,
-      min_angle: 20, max_angle: 160, default_angle: 160, angle: 160, inverted: true,
-      min_label: "20° (Fechado)", max_label: "160° (Esticado)", neutral_label: null,
+      min_angle: 50, max_angle: 140, default_angle: 140, angle: 140, inverted: true,
+      min_label: "50° (Fechado)", max_label: "140° (Esticado)", neutral_label: null,
     },
     elbow: {
       id: "elbow", name: "Cotovelo (Flexão/Extensão)", group: "arm", channel: 8,
@@ -74,31 +74,31 @@ const DEFAULT_FALLBACK_STATE = {
   },
   presets: {
     neutral: {
-      angles: { thumb: 160, index: 20, middle: 20, ring: 20, pinky: 160, elbow: 180, arm_roll: 90, shoulder_pitch: 90, shoulder_abduction: 85 },
+      angles: { thumb: 140, index: 50, middle: 50, ring: 50, pinky: 140, elbow: 180, arm_roll: 90, shoulder_pitch: 90, shoulder_abduction: 85 },
     },
     hand_open: {
-      angles: { thumb: 160, index: 20, middle: 20, ring: 20, pinky: 160 },
+      angles: { thumb: 140, index: 50, middle: 50, ring: 50, pinky: 140 },
     },
     hand_closed: {
-      angles: { thumb: 20, index: 160, middle: 160, ring: 160, pinky: 20 },
+      angles: { thumb: 50, index: 140, middle: 140, ring: 140, pinky: 50 },
     },
     pinch: {
-      angles: { thumb: 40, index: 140, middle: 20, ring: 20, pinky: 160 },
+      angles: { thumb: 50, index: 140, middle: 50, ring: 50, pinky: 140 },
     },
     point: {
-      angles: { thumb: 20, index: 20, middle: 160, ring: 160, pinky: 20 },
+      angles: { thumb: 50, index: 50, middle: 140, ring: 140, pinky: 50 },
     },
     peace: {
-      angles: { thumb: 20, index: 20, middle: 20, ring: 160, pinky: 20 },
+      angles: { thumb: 50, index: 50, middle: 50, ring: 140, pinky: 50 },
     },
     rock: {
-      angles: { thumb: 20, index: 20, middle: 160, ring: 160, pinky: 160 },
+      angles: { thumb: 50, index: 50, middle: 140, ring: 140, pinky: 140 },
     },
     secret: {
-      angles: { thumb: 20, index: 160, middle: 20, ring: 160, pinky: 20 },
+      angles: { thumb: 50, index: 140, middle: 50, ring: 140, pinky: 50 },
     },
     wave_pose: {
-      angles: { thumb: 160, index: 20, middle: 20, ring: 20, pinky: 160, elbow: 135, arm_roll: 90, shoulder_pitch: 115, shoulder_abduction: 45 },
+      angles: { thumb: 140, index: 50, middle: 50, ring: 50, pinky: 140, elbow: 135, arm_roll: 90, shoulder_pitch: 115, shoulder_abduction: 45 },
     },
   },
 };
